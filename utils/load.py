@@ -34,6 +34,16 @@ def load_net(dataset, net, quantize):
                                     num_classes = 100, 
                                     growthRate = 30, 
                                     compressionRate = 2)
+        elif net =='densenet_100_micronet_shakedrop':
+            net = densenet_from_micronet_shakedrop(depth = 100, 
+                                    num_classes = 100, 
+                                    growthRate = 12, 
+                                    compressionRate = 2)
+        elif net =='densenet_172_micronet_shakedrop':
+            net = densenet_from_micronet_shakedrop(depth = 172, 
+                                    num_classes = 100, 
+                                    growthRate = 30, 
+                                    compressionRate = 2)
         else:
             net = ResNet(net, num_classes = num_classes)
     return net
