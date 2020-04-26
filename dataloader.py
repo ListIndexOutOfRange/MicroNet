@@ -6,8 +6,9 @@ from torch.utils.data import DataLoader
 
 from utils.augment import CIFAR10Policy
 from utils.augment.cutout import Cutout
-from utils.augment.fastaugmentations import Augmentation
+from utils.augment.fastaugmentations import FASTAugmentation
 from utils.augment.archive import fa_reduced_cifar10
+from utils.augment.autoaugmicronet import autoaug_dataset_micronet
 
 import config as cfg
 
@@ -37,10 +38,10 @@ def get_transforms():
            transforms.RandomHorizontalFlip()]
     if cfg.dataloader['data_aug']:
         aug += [CIFAR10Policy()]
-    transform_train = transforms.Compose(aug + resize + to_tensor + cutout + normalize)
+    transform_train = transforms.Compose(aug + resize + cutout + to_tensor+ normalize)
     transform_test  = transforms.Compose(resize + to_tensor + normalize)
     if cfg.dataloader['fast_aug']:
-        transform_train.transforms.insert(0, Augmentation(fa_reduced_cifar10()))
+        transform_train.transforms.insert(0, FASTAugmentation(fa_reduced_cifar10()))
     return transform_train, transform_test
 
 
@@ -61,6 +62,10 @@ def get_datasets(transform_train, transform_test):
                            download=cfg.dataloader['download'],
                            train=False,
                            transform=transform_test)
+    elif cfg.dataloader['winner_config']:
+        trainset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], train = True, scale = 255)
+        testset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], train = False, scale = 255)
+        
     else:
         trainset = CIFAR100(cfg.dataloader['rootdir'],
                             download=cfg.dataloader['download'],

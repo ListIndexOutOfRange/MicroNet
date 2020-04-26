@@ -93,7 +93,7 @@ Args:
 
 
 model = {
-    'net': 'densenet_172_micronet',
+    'net': 'densenet_100_micronet',
     'mode': 'basic',
     'label_smoothing': False,
     'smoothing': 0.1,
@@ -134,9 +134,9 @@ Args:
     data_aug (bool): control the use of data augmentation.
                      Dataloaders will always use a minimal augmentation:
                         * Random crop + Random Horizontal Flip
-                     If True, CIFARPolicy from AutoAugment will be added
+                     If True, CIFAR10Policy from AutoAugment will be added
 
-    fast_aug (bool): If True, Fast Auto Augment will be used instead of Auto Augment. 
+    fast_aug (bool): If True, Fast Auto Augment will be used instead of Auto Augment. CIFAR10 Policy will be added
     
     use_cutout (bool): control the use of Cutout in addition to standart data augmentation.
 
@@ -151,6 +151,9 @@ Args:
                    need to be upsampled (for instance when training and efficientnet).
                    If True, CIFAR images will be resized to 224*224 (standart imageNet size). 
                    The upsampling is performed using bicubic interpolation from PIL.Image.
+                   
+    winner_config (bool) : If true, it will use the same config as the winners : auto augment cifar 100 policy, with winner policies
+    winner_policies : Data-aug policy of the winners
 """
 
 dataloader = {
@@ -159,14 +162,54 @@ dataloader = {
     'train_batch_size': 32,
     'test_batch_size': 16,
     'nb_workers': 6,
-    'data_aug': True,
+    'data_aug': False,
     'fast_aug': False,
     'use_cutout': False,
     'n_holes': 1,
     'length': 16,
     'resize': False,
-    'use_fastaugm': False
+    'winner_config':True,
 }
+
+
+winner_policies = [
+[("Invert", 0.2, 2)],
+[("Contrast", 0.4, 4)],
+[("Rotate", 0.5, 1)],
+[("TranslateX", 0.4, 3)],
+[("Sharpness", 0.5, 3)],
+[("ShearY", 0.3, 4)],
+[("TranslateY", 0.6, 8)],
+[("AutoContrast", 0.6, 3)],
+[("Equalize", 0.5, 5)],
+[("Solarize", 0.4, 4)],
+[("Color", 0.5, 5)],
+[("Posterize", 0.2, 2)],
+[("Brightness", 0.4, 5)],
+[("Cutout", 0.3, 3)],
+[("ShearX", 0.1, 3)],
+]
+
+"""
+Defaut winner_policies config
+[
+[("Invert", 0.2, 2)],
+[("Contrast", 0.4, 4)],
+[("Rotate", 0.5, 1)],
+[("TranslateX", 0.4, 3)],
+[("Sharpness", 0.5, 3)],
+[("ShearY", 0.3, 4)],
+[("TranslateY", 0.6, 8)],
+[("AutoContrast", 0.6, 3)],
+[("Equalize", 0.5, 5)],
+[("Solarize", 0.4, 4)],
+[("Color", 0.5, 5)],
+[("Posterize", 0.2, 2)],
+[("Brightness", 0.4, 5)],
+[("Cutout", 0.3, 3)],
+[("ShearX", 0.1, 3)],
+]
+"""
 
 # +-------------------------------------------------------------------------------------+ # 
 # |                                                                                     | #
@@ -301,7 +344,9 @@ def get_experiment_name():
         basename += '_quant'
     if model['label_smoothing']:
         basename += '_ls'
-    if dataloader['data_aug']:
+    if dataloader['winner_config']:
+        basename += '_wc'
+    elif dataloader['data_aug']:
         if dataloader['fast_aug']:
             basename += '_faa'
         else:
@@ -310,6 +355,8 @@ def get_experiment_name():
         basename += '_cutout'
     if dataloader['resize']:
         basename += '_resized'
+    if train['use_cutmix']:
+        basename += '_cutmix'
     if train['use_pruning']:
         basename += '_pruned'
     if train['use_binary_connect']:
