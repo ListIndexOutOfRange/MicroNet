@@ -1,6 +1,6 @@
 """Generic Configuration File For Training Pipeline on CIFAR10/100"""
 
-from brevitas.core.quant import QuantType
+#from brevitas.core.quant import QuantType
 
 
 # +-------------------------------------------------------------------------------------+ # 
@@ -81,8 +81,8 @@ Args:
 dataloader = {
     'rootdir': './data/',
     'download': True,
-    'train_batch_size': 64,
-    'test_batch_size': 64,
+    'train_batch_size': 16,
+    'test_batch_size': 16,
     'nb_workers': 6,
     'data_aug': False,
     'fast_aug': False,
@@ -107,7 +107,8 @@ winner_policies = [
 [("Color", 0.5, 5)],
 [("Posterize", 0.2, 2)],
 [("Brightness", 0.4, 5)],
-[("Cutout", 0.3, 3)],
+#[("Cutout", 0.3, 3)],
+[("Cutout", 0., 0)],
 [("ShearX", 0.1, 3)],
 ]
 
@@ -135,6 +136,7 @@ HOW TO USE:
     - To chose the optimizer itself, use the constant OPTIMIZER
     - To use LookAhead or not, use the constant LOOKAHEAD
     - To change optimizer params, use the appropriate subdict of optim_params
+    Thus one should not modify directly the optim dict
 
 Args:
 
@@ -159,7 +161,7 @@ OPTIMIZER = 'SGD'
 LOOKAHEAD = False
 
 optim_params = {
-    'SGD':    {'lr': 0.1, 'momentum': 0.9, 'nesterov': True, 'weight_decay': 5e-4},
+    'SGD':    {'lr': 0.1, 'momentum': 0.9, 'nesterov': False, 'weight_decay': 5e-4},
     'RAlamb': {'lr': 1e-3, 'betas': (0.9, 0.999), 'eps': 1e-8, 'weight_decay':0}
  }
 
@@ -191,6 +193,7 @@ HOW TO USE:
     - To chose the scheduler itself, use the constant SCHEDULER
     - To use Delay or not, use the constant DELAY
     - To change optimizer params, use the appropriate subdict of optim_params
+    Thus one should not modify directly the optim dict
 
 Args:
 
@@ -222,14 +225,14 @@ Args:
 
 """
 
-SCHEDULER = 'ROP'
+SCHEDULER = 'WarmupCosine'
 DELAY     = False
 
 schedul_params = {
     'ROP'               : {'mode': 'min', 'factor': 0.2, 'patience': 20, 'verbose': True},
     'MultiStep'         : {'milestones': [120, 200], 'gamma': 0.1, 'last_epoch': -1},
     'Cosine'            : {'epochs': 150},
-    'WarmupCosine'      : {'base_lr': 0.001, 'target_lr': 0.1, 'warm_up_epoch': 5, 'cur_epoch': 0}, 
+    'WarmupCosine'      : {'base_lr': 0.001, 'target_lr': 0.1, 'warm_up_epoch': 10, 'cur_epoch': 0}, 
     'WarmRestartsCosine': {'T_0': 150, 'T_mult': 1, 'eta_min': 0, 'last_epoch': -1}
 
 }
@@ -318,8 +321,8 @@ Args:
 
 
 model = {
-    'net': 'densenet100',
-    'activation': 'relu',
+    'net': 'densenet172',
+    'activation': 'mish',
     'self_attention': False,
     'attention_sym': False,
     'shakedrop':False,
@@ -405,7 +408,7 @@ Args:
 """ 
 
 train = {
-    'nb_epochs' : 1,
+    'nb_epochs' : 300,
     'use_early_stopping': True,
     'patience': 50,
     'delta': 0.01,

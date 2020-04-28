@@ -9,8 +9,7 @@ from utils.layers import Swish, Mish, SimpleSelfAttention, ShakeDrop
 
 __all__ = ['densenet_micronet']
 
-def noop(x):
-    return x
+def noop(x): return x
 
 
 class Bottleneck(nn.Module):
@@ -20,12 +19,11 @@ class Bottleneck(nn.Module):
         planes = expansion * growthRate
         self.bn1 = nn.BatchNorm2d(inplanes)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
         if attention:
-            self.bn2 = nn.BatchNorm2d(planes)
             nn.init.constant_(self.bn2.weight, 0.)
             self.attention = SimpleSelfAttention(self.expansion * planes,ks=1,sym=sym)
-        else:
-            self.bn2 = nn.BatchNorm2d(planes) 
+        else: 
             self.attention = noop
         self.conv2 = nn.Conv2d(planes, growthRate, kernel_size=3, padding=1, bias=False)
         self.activation = self._init_activation(activation)

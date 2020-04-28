@@ -4,13 +4,13 @@ from tqdm import tqdm
 import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 
 from utils.decorators import *
 from utils.models import *
 from utils.tweak import EarlyStopping, Distillator
 from utils.augment import Cutmix
-from utils.score import score2019
+#from utils.score import score2019
 
 from dataloader import get_dataloaders
 from model import Model
@@ -32,7 +32,7 @@ class Trainer():
         self.mask               = self._init_pruning()
         self.distillator        = self._init_distillation()
         #self.kmeans             = k_means.K_means(model.net)
-        self.writer             = SummaryWriter(log_dir=cfg.log['tensorboard_path'])
+        #self.writer             = SummaryWriter(log_dir=cfg.log['tensorboard_path'])
         self.early_stopping     = EarlyStopping(cfg.train, cfg.log['checkpoints_path'])
 
     def _init_distillation(self):
@@ -125,7 +125,7 @@ class Trainer():
         self.model.net = self.mask.net
     
     @verbose
-    @toTensorboard
+    #@toTensorboard
     def one_epoch_step(self, current_epoch, nb_epochs):
         """
             the two epoch params are used in the verbose decorator
@@ -135,7 +135,7 @@ class Trainer():
         test_loss, test_acc = self.test()
         if cfg.scheduler['type'] == 'ROP':
             self.model.scheduler.step(test_loss)
-        elif cfg.scheduler['type'] != 'WarmUpCosine':
+        elif cfg.scheduler['type'] != 'WarmupCosine':
             self.model.scheduler.step()
         if cfg.train['use_pruning']:
             self.prune(current_epoch)

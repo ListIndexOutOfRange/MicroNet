@@ -16,8 +16,7 @@ def _weights_init(m):
         init.kaiming_normal_(m.weight)
 
 
-def noop(x):
-    return x
+def noop(x): return x
 
 
 class LambdaLayer(nn.Module):
@@ -74,6 +73,7 @@ class BasicBlockSmall(nn.Module):
     def forward(self, x):
         out = self.activation(self.bn1(self.conv1(x)))
         out = self.attention(self.bn2(self.conv2(out)))
+        print(type(out))
         out += self.shortcut(x)
         out = self.activation(out)
         if self.shkdrp:
