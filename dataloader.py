@@ -63,8 +63,8 @@ def get_datasets(transform_train, transform_test):
                            train=False,
                            transform=transform_test)
     elif cfg.dataloader['winner_config']:
-        trainset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], train = True, scale = 255)
-        testset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], train = False, scale = 255)
+        trainset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], download =download=cfg.dataloader['download'],  train = True, scale = 255)
+        testset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], download=cfg.dataloader['download'], train = False, scale = 255)
         
     else:
         trainset = CIFAR100(cfg.dataloader['rootdir'],
