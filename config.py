@@ -81,7 +81,7 @@ Args:
 dataloader = {
     'rootdir': './data/',
     'download': True,
-    'train_batch_size': 64,
+    'train_batch_size': 128,
     'test_batch_size': 64,
     'nb_workers': 6,
     'data_aug': False,
@@ -222,7 +222,7 @@ Args:
 
 """
 
-SCHEDULER = 'ROP'
+SCHEDULER = 'WarmupCosine'
 DELAY     = False
 
 schedul_params = {
@@ -322,7 +322,7 @@ model = {
     'activation': 'relu',
     'self_attention': False,
     'attention_sym': False,
-    'shakedrop':False,
+    'shakedrop':True,
     'label_smoothing': False,
     'smoothing': 0.1,
     'reduction': 'mean', 
@@ -405,7 +405,7 @@ Args:
 """ 
 
 train = {
-    'nb_epochs' : 1,
+    'nb_epochs' : 1000,
     'use_early_stopping': True,
     'patience': 50,
     'delta': 0.01,
