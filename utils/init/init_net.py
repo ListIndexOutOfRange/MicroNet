@@ -23,7 +23,8 @@ def init_net(dataset, net_name, device, config):
                                 compressionRate = 2,
                                 activation      = config['activation'],
                                 attention       = config['self_attention'],
-                                sym             = config['attention_sym'])
+                                sym             = config['attention_sym'],
+                                shakedrop       = config['shakedrop'])
     elif net_name == 'densenet172':
         net = densenet_micronet(depth           = 172, 
                                 num_classes     = 100, 
@@ -31,7 +32,8 @@ def init_net(dataset, net_name, device, config):
                                 compressionRate = 2,
                                 activation      = config['activation'],
                                 attention       = config['self_attention'],
-                                sym             = config['attention_sym'])
+                                sym             = config['attention_sym'],
+                                shakedrop       = config['shakedrop'])
     else:
         if 'quantize' in config.keys():
             if config['quantize']:
@@ -41,7 +43,8 @@ def init_net(dataset, net_name, device, config):
                              num_classes = num_classes,
                              activation  = config['activation'],
                              attention   = config['self_attention'],
-                             sym         = config['attention_sym'])
+                             sym         = config['attention_sym'],
+                             shakedrop   = config['shakedrop'])
     net = net.to(device)
     if device == 'cuda:0':
         net = nn.DataParallel(net)

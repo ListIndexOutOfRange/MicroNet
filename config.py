@@ -288,6 +288,8 @@ Args:
     attention_sym (bool): force or not the attention matrix to be symetric.
                           It seems having a symetric help convergence. 
     
+    shakedrop (bool) : add shakedrop at the end of the forward,
+    
     label_smoothing (bool): True or False.
                             If True, use utils.LabelSmoothingCrossEntropy 
                             instead of vanilla CrossEntropy.
@@ -316,10 +318,11 @@ Args:
 
 
 model = {
-    'net': 'resnet20',
+    'net': 'densenet100',
     'activation': 'relu',
     'self_attention': False,
     'attention_sym': False,
+    'shakedrop':False,
     'label_smoothing': False,
     'smoothing': 0.1,
     'reduction': 'mean', 
@@ -406,7 +409,7 @@ train = {
     'use_early_stopping': True,
     'patience': 50,
     'delta': 0.01,
-    'use_cutmix': True,
+    'use_cutmix': False,
     'beta': 1.0,
     'p': 0.5,
     'use_binary_connect': False,
@@ -506,6 +509,8 @@ def get_experiment_name():
         basename += '_sa'
     if model['label_smoothing']:
         basename += '_ls'
+    if model['shakedrop']:
+        basename += '_shkdrp'
     if dataloader['winner_config']:
         basename += '_wc'
     elif dataloader['data_aug']:

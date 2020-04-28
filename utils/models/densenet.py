@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from utils.layers import Swish, Mish, SimpleSelfAttention
+from utils.layers import Swish, Mish, SimpleSelfAttention, ShakeDrop
 
 __all__ = ['densenet_micronet']
 
@@ -15,7 +15,7 @@ def noop(x):
 
 class Bottleneck(nn.Module):
     def __init__(self, inplanes, expansion=4, growthRate=12, dropRate=0,
-                 activation='relu', attention=False, sym=False):
+                 activation='relu', attention=False, sym=False, shkdrp = False , p_shakedrop = 1.0):
         super(Bottleneck, self).__init__()
         planes = expansion * growthRate
         self.bn1 = nn.BatchNorm2d(inplanes)
@@ -29,7 +29,10 @@ class Bottleneck(nn.Module):
             self.attention = noop
         self.conv2 = nn.Conv2d(planes, growthRate, kernel_size=3, padding=1, bias=False)
         self.activation = self._init_activation(activation)
+        self.shkdrp = shkdrp
+        self.shake_drop = ShakeDrop(p_shakedrop)
         self.dropRate = dropRate
+        
 
     def _init_activation(self, activation):
         if activation == 'relu':
@@ -46,6 +49,8 @@ class Bottleneck(nn.Module):
         out = self.attention(self.bn2(out))
         out = self.activation(out)
         out = self.conv2(out)
+        if self.shkdrp:
+            out = self.shake_drop(out)
         if self.dropRate > 0:
             out = F.dropout(out, p=self.dropRate, training=self.training)
         out = torch.cat((x, out), 1)
@@ -53,12 +58,14 @@ class Bottleneck(nn.Module):
 
 
 class BasicBlock(nn.Module):
-    def __init__(self, inplanes, expansion=1, growthRate=12, dropRate=0, activation='relu'):
+    def __init__(self, inplanes, expansion=1, growthRate=12, dropRate=0, activation='relu',shkdrp = False , p_shakedrop = 1.0):
         super(BasicBlock, self).__init__()
         planes = expansion * growthRate
         self.bn1 = nn.BatchNorm2d(inplanes)
         self.conv1 = nn.Conv2d(inplanes, growthRate, kernel_size=3, padding=1, bias=False)
         self.activation = self._init_activation(activation)
+        self.shkdrp = shkdrp
+        self.shake_drop = ShakeDrop(p_shakedrop)
         self.dropRate = dropRate
     
     def _init_activation(self, activation):
@@ -73,6 +80,8 @@ class BasicBlock(nn.Module):
         out = self.bn1(x)
         out = self.activation(out)
         out = self.conv1(out)
+        if self.shkdrp:
+            out = self.shake_drop(out)
         if self.dropRate > 0:
             out = F.dropout(out, p=self.dropRate, training=self.training)
         out = torch.cat((x, out), 1)
@@ -106,7 +115,7 @@ class DenseNet_MicroNet(nn.Module):
 
     def __init__(self, depth=22, block=Bottleneck, 
                  dropRate=0, num_classes=100, growthRate=12, compressionRate=2,
-                 init = 'Default', activation='relu', attention=False, sym=False):
+                 init = 'Default', activation='relu', attention=False, sym=False, shakedrop = False):
         super(DenseNet_MicroNet, self).__init__()
 
         assert (depth - 4) % 3 == 0, 'depth should be 3n+4'
@@ -114,6 +123,7 @@ class DenseNet_MicroNet(nn.Module):
 
         self.growthRate = growthRate
         self.dropRate = dropRate
+        self.shakedrop = shakedrop
 
         # self.inplanes is a global variable used across multiple
         # helper functions
@@ -149,9 +159,10 @@ class DenseNet_MicroNet(nn.Module):
     def _make_denseblock(self, block, blocks, activation, attention, sym):
         layers = []
         for i in range(blocks):
+            
             # Currently we fix the expansion ratio as the default value
             layers.append(block(self.inplanes, growthRate=self.growthRate, dropRate=self.dropRate,
-                                activation=activation, attention=attention, sym=sym))
+                                activation=activation, attention=attention, sym=sym, shkdrp=self.shakedrop))
             self.inplanes += self.growthRate
 
         return nn.Sequential(*layers)

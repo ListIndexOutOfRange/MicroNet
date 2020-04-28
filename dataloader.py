@@ -6,8 +6,9 @@ from torch.utils.data import DataLoader
 
 from utils.augment import CIFAR10Policy
 from utils.augment.cutout import Cutout
-from utils.augment.fastaugmentations import Augmentation
+from utils.augment.fastaugmentations import FASTAugmentation
 from utils.augment.archive import fa_reduced_cifar10
+from utils.augment.autoaugmicronet import autoaug_dataset_micronet
 
 import config as cfg
 
