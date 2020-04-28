@@ -40,7 +40,7 @@ def get_transforms():
     transform_train = transforms.Compose(aug + resize + cutout + to_tensor + normalize)
     transform_test  = transforms.Compose(resize + to_tensor + normalize)
     if cfg.dataloader['fast_aug']:
-        transform_train.transforms.insert(0, Augmentation(fa_reduced_cifar10()))
+        transform_train.transforms.insert(0, FASTAugmentation(fa_reduced_cifar10()))
     return transform_train, transform_test
 
 
@@ -61,6 +61,10 @@ def get_datasets(transform_train, transform_test):
                            download=cfg.dataloader['download'],
                            train=False,
                            transform=transform_test)
+    elif cfg.dataloader['winner_config']:
+        trainset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], train = True, scale = 255)
+        testset = autoaug_dataset_micronet.CIFAR100(cfg.dataloader['rootdir'], train = False, scale = 255)
+        
     else:
         trainset = CIFAR100(cfg.dataloader['rootdir'],
                             download=cfg.dataloader['download'],
