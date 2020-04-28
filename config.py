@@ -384,7 +384,7 @@ train = {
     'use_binary_connect': False,
     'use_pruning':False,
     'verbose': True,
-    'distillation':True
+    'distillation':False
 }
 
 
@@ -498,15 +498,5 @@ def get_experiment_name():
 log = {
     'tensorboard_path': './runs/'+dataset+'/'+get_experiment_name(),
     'checkpoints_path': './checkpoints/'+dataset+'/'+get_experiment_name()+'.pt'
-}
-
-
-
-
-Kmean = {
-    'c':2,
-    'k':40, #c'est pas le CR
-    'logk':6,
-    'CR':0,
 }
     
