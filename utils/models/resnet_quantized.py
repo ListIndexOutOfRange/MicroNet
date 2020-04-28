@@ -97,14 +97,17 @@ class ResNetSmall(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        out = self.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.bn1(self.conv1(x)))
         out = self.layer1(out)
+        pool1 = out
         out = self.layer2(out)
+        pool2 = out
         out = self.layer3(out)
         out = F.avg_pool2d(out, out.size()[3])
         out = out.view(out.size(0), -1)
+        pool3 = out
         out = self.linear(out)
-        return out
+        return out, [pool1, pool2, pool3]
 
     
 def ResNet_Quantized(arch, num_classes = 10):
