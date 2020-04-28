@@ -73,7 +73,7 @@ Args:
                    The upsampling is performed using bicubic interpolation from PIL.Image.
                    
     winner_config (bool) : If true, it will use the same config as the winners : auto augment cifar 100 policy, with winner policies
-    winner_policies : Data-aug policy of the winners. Set cutout in winner_policies as false if cutmix or fmix.
+    winner_policies : Data-aug policy of the winners. Set cutout in winner_policies as (0,0) if cutmix or fmix.
 """
 
 
@@ -387,7 +387,7 @@ Args:
 
     use_cutmix (bool): controls the use of cutmix.
                        If True, Trainer.train() will call the Cutmix class 
-                       from utils.augment.cutmix with a probability p. (Set cutout in winner_policies as False if cutmix or fmix.)
+                       from utils.augment.cutmix with a probability p. (Set cutout in winner_policies as (0,0) if cutmix)
 
     beta (float): If use_cutmix is False, this has no effect.
                   Else, a number is generated via numpy.random.beta(beta,beta)
