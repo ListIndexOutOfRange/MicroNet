@@ -1,7 +1,5 @@
 """Generic Configuration File For Training Pipeline on CIFAR10/100"""
 
-from brevitas.core.quant import QuantType
-
 
 # +-------------------------------------------------------------------------------------+ # 
 # |                                                                                     | #
@@ -81,9 +79,9 @@ Args:
 dataloader = {
     'rootdir': './data/',
     'download': True,
-    'train_batch_size': 64,
-    'test_batch_size': 64,
-    'nb_workers': 6,
+    'train_batch_size': 32,
+    'test_batch_size': 32,
+    'nb_workers': 4,
     'data_aug': False,
     'fast_aug': False,
     'use_cutout': False,
@@ -327,8 +325,6 @@ model = {
     'smoothing': 0.1,
     'reduction': 'mean', 
     'quantize': False,
-    'weight_quant_type': QuantType.INT,
-    'weight_bit_width': 8
 }
 
 

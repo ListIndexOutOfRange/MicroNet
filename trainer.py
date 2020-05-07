@@ -151,8 +151,8 @@ class Trainer():
                 if self.early_stopping.early_stop:
                     print("Early stopping")
                     break
-        # self.model.net.eval()
-        # score2019(self.model)
+        self.model.net.eval()
+        score2019(self.model)
         
         
 
